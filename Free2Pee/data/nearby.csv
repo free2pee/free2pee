@@ -1,0 +1,29 @@
+business_status,geometry,icon,icon_background_color,icon_mask_base_uri,name,opening_hours,photos,place_id,plus_code,price_level,rating,reference,scope,types,user_ratings_total,vicinity
+OPERATIONAL,"{
+   ""location"": {
+                  ""lat"": 42.3892633,
+                  ""lng"": -71.1434155
+               },
+   ""viewport"": {
+                  ""northeast"": {
+                                  ""lat"": 42.39067822989272,
+                                  ""lng"": -71.14213692010728
+                               },
+                  ""southwest"": {
+                                  ""lat"": 42.38797857010727,
+                                  ""lng"": -71.14483657989273
+                               }
+               }
+}",https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/restaurant-71.png,#FF9E67,https://maps.gstatic.com/mapfiles/place_api/icons/v2/restaurant_pinlet,Chipotle Mexican Grill,"{
+   ""open_now"": true
+}","JSON3.Object[{
+              ""height"": 3024,
+   ""html_attributions"": [
+                          ""<a href=\""https://maps.google.com/maps/contrib/105815492679849996284\"">RoadTrip NewEngland</a>""
+                        ],
+     ""photo_reference"": ""AfLeUgNpZY4bnST-RMYs_kEUG-8pWyRm1nk8cn4umx_hFrxhOXErXbXXxuqtHbcnu45f1024m7qNQKwNpRsM_efKodjhjsW0DJBkGrprUxI6C04buMj29JZJwFM-yF3zPsGfGHpZy_N3fPH4yg8HoVjwNX4kdr5YVrlaxMZGxfkoJfXw33bn"",
+               ""width"": 4032
+}]",ChIJ71ekMAp344kRQiybXfOzZnM,"{
+   ""compound_code"": ""9VQ4+PJ Cambridge, Massachusetts"",
+     ""global_code"": ""87JC9VQ4+PJ""
+}",1,3.1,ChIJ71ekMAp344kRQiybXfOzZnM,GOOGLE,"[""restaurant"", ""food"", ""point_of_interest"", ""establishment""]",358,"227 Alewife Brook Pkwy Spc B5, Cambridge"
