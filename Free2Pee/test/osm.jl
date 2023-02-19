@@ -1,4 +1,4 @@
-using OpenStreetMapX, Free2Pee, EzXML, XMLDict, CSV, DataFrames
+using Free2Pee, EzXML, XMLDict, CSV, DataFrames, JSON3, JSONTables
 _fn = "osmmap_central.osm"
 fn = Free2Pee.data(_fn)
 # x = get_map_data(fn)
@@ -29,3 +29,21 @@ function tags_to_dict(tags)
 end
 toilets_idxs = findall(x->haskey(x, "toilets"), tags_to_dict.(ts))
 tls = tns[toilets_idxs]
+
+latitude = 42.3640906
+longitude = -71.1018806
+
+"the alg"
+dist(x, y) = sqrt((x[1] - y[1])^2 + (x[2] - y[2])^2)
+
+j = JSON3.read(read("sample.json"))
+ns = j.elements
+
+function lat_long_pair(n)
+    return (n["lat"], n["lon"])
+end
+
+ps = lat_long_pair.(ns)
+distances = dist.(ps, Ref((latitude, longitude)))
+sorted_ns = ns[sortperm(distances)]
+DataFrame(sorted_ns)
