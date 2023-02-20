@@ -47,3 +47,10 @@ ps = lat_long_pair.(ns)
 distances = dist.(ps, Ref((latitude, longitude)))
 sorted_ns = ns[sortperm(distances)]
 DataFrame(sorted_ns)
+
+
+fn = _data("luxembourg.osm")
+z = readxml(fn)
+z.node
+n = z.node
+d = XMLDict.xml_dict(z)
