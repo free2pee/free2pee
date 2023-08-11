@@ -303,7 +303,6 @@ pub fn fetch_example(cx: Scope) -> impl IntoView {
                         {bathroom_elements}
                         </tbody>
                         </table>
-                        // <p>{route_str}</p>
 
                 }
             })
