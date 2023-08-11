@@ -1,5 +1,5 @@
-# outcall
+# free2pee
 
-playground
+https://free2pee.github.io/free2pee/
 
-credit to https://github.com/SilenLoc/outcall
+simple tool to find nearby bathrooms, powered by openstreetmap
