@@ -233,8 +233,9 @@ pub fn fetch_example(cx: Scope) -> impl IntoView {
 
         view! { cx,
             <div class="error">
-                <h2>"Error"</h2>
+                <h2>"Error: you have been deemed unworthy of peeing!"</h2>
                 <ul>{error_list}</ul>
+                <p>Submit suggestions/bugs at <a href="https://github.com/free2pee/free2pee" target="_blank">GitHub Source</a> </p>
             </div>
         }
     };
@@ -287,8 +288,10 @@ pub fn fetch_example(cx: Scope) -> impl IntoView {
                     }).collect_view(cx);
                     
                     view! { cx,
-                        <h2> {format!("FREE2PEE: Bathrooms accessed at {} around {},{}", date_string, lat, lon)} </h2>
-                        <a href={format!("https://mapcomplete.osm.be/toilets.html?z=18&lat={lat}&lon=-{lon}")} target="_blank">Open in MapComplete</a>
+                        <h2> <a href="https://github.com/free2pee/free2pee" target="_blank">FREE2PEE</a> </h2>
+                        <h2> {format!("Bathrooms accessed at {} around {},{}", date_string, lat, lon)} </h2>
+                        <a href={format!("https://mapcomplete.osm.be/toilets.html?z=18&lat={lat}&lon=-{lon}")} target="_blank">Open in map</a>
+                        // <span style="width: 10px; display: inline-block;"></span>
                         <table>
                         <thead>
                         <tr>
@@ -303,7 +306,6 @@ pub fn fetch_example(cx: Scope) -> impl IntoView {
                         {bathroom_elements}
                         </tbody>
                         </table>
-
                 }
             })
         })
