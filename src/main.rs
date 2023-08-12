@@ -42,7 +42,7 @@ pub struct Element {
 
 #[derive(Error, Clone, Debug)]
 pub enum BathroomError {
-    #[error("Failed to fetch bathrooms.")]
+    #[error("Failed to fetch bathrooms. Please ensure that location services are enabled for device and browser.")]
     FetchBathroomsFailed,
 }
 
