@@ -235,7 +235,12 @@ pub fn fetch_example(cx: Scope) -> impl IntoView {
             <div class="error">
                 <h2>"Error: you have been deemed unworthy of peeing!"</h2>
                 <ul>{error_list}</ul>
-                <p>Submit suggestions/bugs at <a href="https://github.com/free2pee/free2pee" target="_blank">GitHub Source</a> </p>
+                <p>
+                    Submit suggestions/bugs at
+                    <a href="https://github.com/free2pee/free2pee" target="_blank">
+                        GitHub Source
+                    </a>
+                </p>
             </div>
         }
     };
@@ -262,51 +267,76 @@ pub fn fetch_example(cx: Scope) -> impl IntoView {
                     let s = format!("{:?}", element.tags);
                     view! { cx,
                         <tr>
-                        // <td>
-                        // {format!("{},{}",element.lat, element.lon)}
-                        // </td>
-                        <td>
-                        <a href={format!("https://www.openstreetmap.org/node/{}", element.id)} target="_blank">OSM:{element.id}</a>
-                        </td>
-                        <td>
-                        // using origin looks more accurate on desktop, but i think current location origin is better for mobile
-                            // <a href={format!("https://www.google.com/maps/dir/?api=1&origin={lat},{lon}&destination={},{}", element.lat, element.lon)} target="_blank">"Google Maps"</a>
-                            <a href={format!("https://www.google.com/maps/dir/?api=1&destination={},{}", element.lat, element.lon)} target="_blank">"Google Maps"</a>
-                        </td>
-                        // <td>
-                        // <a href={format!("https://www.openstreetmap.org/edit?node={}", element.id)} target="_blank">Edit OSM</a>
-                        // </td>
-                        <td>
-                            {format!("{:?}", dist)}
-                        </td>
-                        <td>
-                            {format!("{:?}", dur)}
-                        </td>
+                            // <td>
+                            // {format!("{},{}",element.lat, element.lon)}
+                            // </td>
+                            <td>
+                                <a
+                                    href=format!(
+                                        "https://www.openstreetmap.org/node/{}", element.id
+                                    )
+                                    target="_blank"
+                                >
+                                    OSM:
+                                    {element.id}
+                                </a>
+                            </td>
+                            <td>
+                                // using origin looks more accurate on desktop, but i think current location origin is better for mobile
+                                // <a href={format!("https:
+                                <a
+                                    href=format!(
+                                        "https://www.google.com/maps/dir/?api=1&destination={},{}",
+                                        element.lat, element.lon
+                                    )
+                                    target="_blank"
+                                >
+                                    "Google Maps"
+                                </a>
+                            </td>
+                            // <td>
+                            // <a href={format!("https:
+                            // </td>
+                            <td>{format!("{:?}", dist)}</td>
+                            <td>{format!("{:?}", dur)}</td>
                         </tr>
                         <p>{s}</p>
-                        }
+                    }
                     }).collect_view(cx);
                     
                     view! { cx,
-                        <h2> <a href="https://github.com/free2pee/free2pee" target="_blank">FREE2PEE</a> </h2>
-                        <h2> {format!("Bathrooms accessed at {} around {},{}", date_string, lat, lon)} </h2>
+                        <h2>
+                            <a href="https://github.com/free2pee/free2pee" target="_blank">
+                                FREE2PEE
+                            </a>
+                        </h2>
+                        <h2>
+                            {format!(
+                                "Bathrooms accessed at {} around {},{}", date_string, lat, lon
+                            )}
+                        </h2>
                         // <span style="width: 10px; display: inline-block;"></span>
                         <table>
-                        <thead>
-                        <tr>
-                        // <th>"Node lat,lon"</th>
-                        <th>"OSM Node"</th>
-                        <th>"Directions"</th>
-                        <th>"Distance [m]"</th>
-                        <th>"Duration [s]"</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {bathroom_elements}
-                        </tbody>
+                            <thead>
+                                <tr>
+                                    // <th>"Node lat,lon"</th>
+                                    <th>"OSM Node"</th>
+                                    <th>"Directions"</th>
+                                    <th>"Distance [m]"</th>
+                                    <th>"Duration [s]"</th>
+                                </tr>
+                            </thead>
+                            <tbody>{bathroom_elements}</tbody>
                         </table>
-                        <a href={format!("https://mapcomplete.osm.be/toilets.html?z=18&lat={lat}&lon=-{lon}")} target="_blank">View a map of nearby bathrooms</a>
-                }
+                        <a
+                            href=format!(
+                                "https://mapcomplete.osm.be/toilets.html?z=18&lat={lat}&lon=-{lon}"
+                            )
+                            target="_blank"
+                        >
+                            View a map of nearby bathrooms
+                        </a>
+                    }
             })
         })
     };
@@ -317,9 +347,7 @@ pub fn fetch_example(cx: Scope) -> impl IntoView {
                 <Transition fallback=move || {
                     view! { cx, <div>"Loading (Suspense Fallback)..."</div> }
                 }>
-                <div>
-                    {bathrooms_view}
-                </div>
+                    <div>{bathrooms_view}</div>
                 </Transition>
             </ErrorBoundary>
         </div>
