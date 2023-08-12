@@ -290,7 +290,6 @@ pub fn fetch_example(cx: Scope) -> impl IntoView {
                     view! { cx,
                         <h2> <a href="https://github.com/free2pee/free2pee" target="_blank">FREE2PEE</a> </h2>
                         <h2> {format!("Bathrooms accessed at {} around {},{}", date_string, lat, lon)} </h2>
-                        <a href={format!("https://mapcomplete.osm.be/toilets.html?z=18&lat={lat}&lon=-{lon}")} target="_blank">Open in map</a>
                         // <span style="width: 10px; display: inline-block;"></span>
                         <table>
                         <thead>
@@ -306,6 +305,7 @@ pub fn fetch_example(cx: Scope) -> impl IntoView {
                         {bathroom_elements}
                         </tbody>
                         </table>
+                        <a href={format!("https://mapcomplete.osm.be/toilets.html?z=18&lat={lat}&lon=-{lon}")} target="_blank">View a map of nearby bathrooms</a>
                 }
             })
         })
