@@ -238,19 +238,13 @@ pub async fn fetch_bathrooms(_: ()) -> Result<(OverpassResponse, TableRoot, (f64
         }
     }
 
-    let url = format!(
-        "https://overpass-api.de/api/interpreter?data=[out:json];(node[\"amenity\"=\"toilets\"](around:{},{},{});way[\"amenity\"=\"toilets\"](around:{},{},{}););out;",
-        radius, lat, lon, radius, lat, lon
-    );
-
-    let res = reqwasm::http::Request::get(&url)
-        .send()
-        .await
-        .unwrap()
-        .json::<OverpassResponse>()
-        .await
-        .unwrap();
-
+    let res = reqwasm::http::Request::get(&format!(
+        "https://overpass-api.de/api/interpreter?data=[out:json];node[\"amenity\"=\"toilets\"](around:{radius},{lat},{lon});out;"
+    ))
+    .send()
+    .await.unwrap()
+    .json::<OverpassResponse>()
+    .await.unwrap();
     let destinations: Vec<_> = res.elements.iter().map(|e| (e.lat, e.lon)).collect();
     // if destinations.is_empty() {
     // Ok((res, None, (lat, lon)))
