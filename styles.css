@@ -1,0 +1,45 @@
+body {
+    font-family: sans-serif;
+    /* A readable sans-serif font */
+    font-size: 16px;
+    /* Standard font size */
+    line-height: 1.5;
+    /* Adequate line spacing */
+    color: #333;
+    /* Dark grey color for better readability */
+    margin: 20px;
+    /* Some margin around the page */
+}
+
+table {
+    width: 100%;
+    /* Table takes full width */
+    border-collapse: collapse;
+    /* Remove gaps between cells */
+    border: 1px solid #ccc;
+    /* Light border around the table */
+    margin-bottom: 20px;
+    /* Margin at the bottom for spacing */
+}
+
+th,
+td {
+    text-align: left;
+    /* Align text to the left */
+    padding: 10px;
+    /* Padding inside each cell for readability */
+    border: 1px solid #ccc;
+    /* Light border around cells */
+}
+
+th {
+    background-color: #f0f0f0;
+    /* Background color for header cells */
+    font-weight: bold;
+    /* Bold text for header cells */
+}
+
+tr:nth-child(even) {
+    background-color: #f8f8f8;
+    /* Alternate row coloring for better scanning */
+}

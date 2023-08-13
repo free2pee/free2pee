@@ -395,6 +395,29 @@ dependencies = [
 ]
 
 [[package]]
+name = "free2pee"
+version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "console_error_panic_hook",
+ "console_log",
+ "futures",
+ "js-sys",
+ "leptos",
+ "leptos_router",
+ "log",
+ "reqwasm",
+ "serde",
+ "serde-wasm-bindgen",
+ "serde_derive",
+ "serde_json",
+ "thiserror",
+ "wasm-bindgen",
+ "wasm-bindgen-test",
+ "web-sys",
+]
+
+[[package]]
 name = "futures"
 version = "0.3.28"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1067,29 +1090,6 @@ checksum = "ccd746e37177e1711c20dd619a1620f34f5c8b569c53590a72dedd5344d8924a"
 dependencies = [
  "dlv-list",
  "hashbrown 0.12.3",
-]
-
-[[package]]
-name = "outcall"
-version = "0.1.0"
-dependencies = [
- "async-trait",
- "console_error_panic_hook",
- "console_log",
- "futures",
- "js-sys",
- "leptos",
- "leptos_router",
- "log",
- "reqwasm",
- "serde",
- "serde-wasm-bindgen",
- "serde_derive",
- "serde_json",
- "thiserror",
- "wasm-bindgen",
- "wasm-bindgen-test",
- "web-sys",
 ]
 
 [[package]]
