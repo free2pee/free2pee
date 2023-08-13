@@ -176,7 +176,7 @@ pub async fn walking_time_distance(
     Ok(distances)
 }
 
-pub async fn fetch_bathrooms(_: ()) -> Result<(OverpassResponse, Option<TableRoot>, (f64, f64))> {
+pub async fn fetch_bathrooms(_: ()) -> Result<(OverpassResponse, TableRoot, (f64, f64))> {
     let (sender, receiver) = oneshot::channel::<Result<(f64, f64), BathroomError>>();
     let sender = Arc::new(Mutex::new(Some(sender)));
 
@@ -246,15 +246,16 @@ pub async fn fetch_bathrooms(_: ()) -> Result<(OverpassResponse, Option<TableRoo
     .json::<OverpassResponse>()
     .await.unwrap();
     let destinations: Vec<_> = res.elements.iter().map(|e| (e.lat, e.lon)).collect();
-    if destinations.is_empty() {
-        Ok((res, None, (lat, lon)))
-    } else {
-        let json = fetch_table_data((lat, lon), destinations).await?;
-        let val = serde_wasm_bindgen::to_value(&json).unwrap();
+    // if destinations.is_empty() {
+    // Ok((res, None, (lat, lon)))
+    // } else {
+    let json = fetch_table_data((lat, lon), destinations).await?;
+    let val = serde_wasm_bindgen::to_value(&json).unwrap();
 
-        console::log_1(&val);
-        Ok((res, Some(json), (lat, lon)))
-    }
+    console::log_1(&val);
+    // Ok((res, Some(json), (lat, lon)))
+    Ok((res, json, (lat, lon)))
+    // }
 }
 
 pub fn fetch_example(cx: Scope) -> impl IntoView {
@@ -274,6 +275,7 @@ pub fn fetch_example(cx: Scope) -> impl IntoView {
             <div class="error">
                 <h2>"Error: you have been deemed unworthy of peeing!"</h2>
                 <ul>{error_list}</ul>
+                <p> If youre seeing missing field distances at line 1 column 85 then this is likely just that there are no bathrooms around you! In this case it is recommended to pee outside!! Take it in, each piss is a gift </p>
                 <p>
                     Submit suggestions/bugs at
                     <a href="https://github.com/free2pee/free2pee" target="_blank">
@@ -288,7 +290,7 @@ pub fn fetch_example(cx: Scope) -> impl IntoView {
         bathrooms.read(cx).map(|data| {
             data.map(|data| {
                 let (el_data, routing_json, (lat, lon)) = data;
-                let routing_json = routing_json.unwrap();
+                // let routing_json = routing_json.unwrap();
                 // if let Ok(routing_json) = routing_json {
 
                 // }
