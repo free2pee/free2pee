@@ -26,21 +26,44 @@ pub struct OverpassResponse {
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
+pub struct Element {
+    pub id: i64,
+    pub lat: Option<f64>,
+    pub lon: Option<f64>,
+    pub tags: HashMap<String, String>,
+    #[serde(rename = "type")]
+    pub type_field: String,
+    pub nodes: Option<Vec<i64>>,
+    pub center: Option<Center>,
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Center {
+    pub lat: f64,
+    pub lon: f64,
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Osm3s {
     pub copyright: String,
     #[serde(rename = "timestamp_osm_base")]
     pub timestamp_osm_base: String,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Element {
-    pub id: i64,
-    pub lat: f64,
-    pub lon: f64,
-    pub tags: HashMap<String, String>,
-    #[serde(rename = "type")]
-    pub type_field: String,
+impl Element {
+    pub fn get_coords(&self) -> Option<(f64, f64)> {
+        if let (Some(lat), Some(lon)) = (self.lat, self.lon) {
+            Some((lat, lon))
+        } else if let Some(center) = &self.center {
+            Some((center.lat, center.lon))
+        } else {
+            let val = serde_wasm_bindgen::to_value(self).unwrap();
+            log_1(&val);
+            None
+        }
+    }
 }
 
 #[derive(Error, Clone, Debug)]
@@ -176,6 +199,21 @@ pub async fn walking_time_distance(
     Ok(distances)
 }
 
+fn format_query(radius: i32, lat: f64, lon: f64) -> String {
+    format!(
+        "(node[\"amenity\"=\"toilets\"](around:{},{},{});way[\"amenity\"=\"toilets\"](around:{},{},{}););out body;out center;",
+        radius, lat, lon, radius, lat, lon
+    )
+}
+
+fn query_url(radius: i32, lat: f64, lon: f64) -> String {
+    let query = format_query(radius, lat, lon);
+    format!(
+        "https://overpass-api.de/api/interpreter?data=[out:json];{}",
+        query
+    )
+}
+
 pub async fn fetch_bathrooms(_: ()) -> Result<(OverpassResponse, TableRoot, (f64, f64))> {
     let (sender, receiver) = oneshot::channel::<Result<(f64, f64), BathroomError>>();
     let sender = Arc::new(Mutex::new(Some(sender)));
@@ -222,9 +260,9 @@ pub async fn fetch_bathrooms(_: ()) -> Result<(OverpassResponse, TableRoot, (f64
     // Get the radius, or default to 2000 if not provided.
     let radius: i64 = search_params
         .get("around")
-        .unwrap_or_else(|| "1000".to_string())
+        .unwrap_or_else(|| "2000".to_string())
         .parse()
-        .unwrap_or(1000);
+        .unwrap_or(2000);
 
     if let Some(lat_qsp) = search_params.get("lat") {
         if let Ok(new_lat) = lat_qsp.parse::<f64>() {
@@ -237,25 +275,22 @@ pub async fn fetch_bathrooms(_: ()) -> Result<(OverpassResponse, TableRoot, (f64
             lon = new_lon;
         }
     }
+    let url = query_url(radius as i32, lat, lon);
+    let res = reqwasm::http::Request::get(&url)
+        .send()
+        .await
+        .unwrap()
+        .json::<OverpassResponse>()
+        .await
+        .unwrap();
+    let destinations: Vec<_> = res.elements.iter().filter_map(|e| e.get_coords()).collect();
 
-    let res = reqwasm::http::Request::get(&format!(
-        "https://overpass-api.de/api/interpreter?data=[out:json];node[\"amenity\"=\"toilets\"](around:{radius},{lat},{lon});out;"
-    ))
-    .send()
-    .await.unwrap()
-    .json::<OverpassResponse>()
-    .await.unwrap();
-    let destinations: Vec<_> = res.elements.iter().map(|e| (e.lat, e.lon)).collect();
-    // if destinations.is_empty() {
-    // Ok((res, None, (lat, lon)))
-    // } else {
     let json = fetch_table_data((lat, lon), destinations).await?;
+
     let val = serde_wasm_bindgen::to_value(&json).unwrap();
 
     console::log_1(&val);
-    // Ok((res, Some(json), (lat, lon)))
     Ok((res, json, (lat, lon)))
-    // }
 }
 
 pub fn fetch_example(cx: Scope) -> impl IntoView {
@@ -275,7 +310,9 @@ pub fn fetch_example(cx: Scope) -> impl IntoView {
             <div class="error">
                 <h2>"Error: you have been deemed unworthy of peeing!"</h2>
                 <ul>{error_list}</ul>
-                <p> If youre seeing missing field distances at line 1 column 85 then this is likely just that there are no bathrooms around you! In this case it is recommended to pee outside!! Take it in, each piss is a gift </p>
+                <p>
+                    If youre seeing missing field distances at line 1 column 85 then this is likely just that there are no bathrooms around you! In this case it is recommended to pee outside!! Take it in, each piss is a gift
+                </p>
                 <p>
                     Submit suggestions/bugs at
                     <a href="https://github.com/free2pee/free2pee" target="_blank">
@@ -290,15 +327,8 @@ pub fn fetch_example(cx: Scope) -> impl IntoView {
         bathrooms.read(cx).map(|data| {
             data.map(|data| {
                 let (el_data, routing_json, (lat, lon)) = data;
-                // let routing_json = routing_json.unwrap();
-                // if let Ok(routing_json) = routing_json {
-
-                // }
                 let now = js_sys::Date::new_0(); //.to_json();
                 let date_string = now.to_locale_time_string("en-US"); //.to_string();
-                                                                      // let routes = routing_json["routes"].as_array().unwrap();
-                                                                      // log!("routes: {:?}", routes);
-                                                                      // let route_str = format!("{:?}", routing_json.clone());
                 let route_str = serde_json::to_string_pretty(&routing_json).unwrap();
                 let dists = &routing_json.distances[0];
                 let durs = &routing_json.durations[0];
@@ -310,46 +340,45 @@ pub fn fetch_example(cx: Scope) -> impl IntoView {
                     .collect();
                 bathroom_data.sort_by(|a, b| a.1.partial_cmp(b.1).unwrap());
 
-                let bathroom_elements = bathroom_data.iter().map(|((element, dist), dur)| {
+                let bathroom_elements = bathroom_data.iter().filter_map(|((element, dist), dur)| {
                     let s = format!("{:?}", element.tags);
-                    view! { cx,
-                        <tr>
-                            // <td>
-                            // {format!("{},{}",element.lat, element.lon)}
-                            // </td>
-                            <td>
-                                <a
-                                    href=format!(
-                                        "https://www.openstreetmap.org/node/{}", element.id
-                                    )
-                                    target="_blank"
-                                >
-                                    OSM:
-                                    {element.id}
-                                </a>
-                            </td>
-                            <td>
-                                // using origin looks more accurate on desktop, but i think current location origin is better for mobile
-                                // <a href={format!("https:
-                                <a
-                                    href=format!(
-                                        "https://www.google.com/maps/dir/?api=1&destination={},{}",
-                                        element.lat, element.lon
-                                    )
-                                    target="_blank"
-                                >
-                                    "Google Maps"
-                                </a>
-                            </td>
-                            // <td>
-                            // <a href={format!("https:
-                            // </td>
-                            <td>{format!("{:?}", dist)}</td>
-                            <td>{format!("{:?}", dur)}</td>
-                        </tr>
-                        <p>{s}</p>
+                    if let Some((el_lat, el_lon)) = element.get_coords() {
+                        Some(view! { cx,
+                            <tr>
+                                <td>
+                                    <a
+                                        href=format!(
+                                            "https://www.openstreetmap.org/node/{}", element.id
+                                        )
+
+                                        target="_blank"
+                                    >
+                                        OSM:
+                                        {element.id}
+                                    </a>
+                                </td>
+                                <td>
+                                    <a
+                                        // using origin looks more accurate on desktop, but i think current location origin is better for mobile
+                                        href=format!(
+                                            "https://www.google.com/maps/dir/?api=1&destination={},{}",
+                                            el_lat, el_lon
+                                        )
+
+                                        target="_blank"
+                                    >
+                                        "Google Maps"
+                                    </a>
+                                </td>
+                                <td>{format!("{:?}", dist)}</td>
+                            // <td>{format!("{:?}", dur)}</td>
+                            </tr>
+                            <p>{s}</p>
+                        })
+                    } else {
+                        None // Skip this iteration if get_coords returns None
                     }
-                    }).collect_view(cx);
+                }).collect_view(cx);
 
                 view! { cx,
                     <h2>
@@ -358,9 +387,7 @@ pub fn fetch_example(cx: Scope) -> impl IntoView {
                         </a>
                     </h2>
                     <h2>
-                        {format!(
-                            "Bathrooms accessed at {} around {},{}", date_string, lat, lon
-                        )}
+                        {format!("Bathrooms accessed at {} around {},{}", date_string, lat, lon)}
                     </h2>
                     // <span style="width: 10px; display: inline-block;"></span>
                     <table>
@@ -370,7 +397,7 @@ pub fn fetch_example(cx: Scope) -> impl IntoView {
                                 <th>"OSM Node"</th>
                                 <th>"Directions"</th>
                                 <th>"Distance [m]"</th>
-                                <th>"Duration [s]"</th>
+                            // <th>"Duration [s]"</th>
                             </tr>
                         </thead>
                         <tbody>{bathroom_elements}</tbody>
@@ -379,6 +406,7 @@ pub fn fetch_example(cx: Scope) -> impl IntoView {
                         href=format!(
                             "https://mapcomplete.osm.be/toilets.html?z=18&lat={lat}&lon=-{lon}"
                         )
+
                         target="_blank"
                     >
                         View a map of nearby bathrooms
