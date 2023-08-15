@@ -1,0 +1,63 @@
+body {
+    font-family: 'Comic Sans MS', sans-serif;
+    /* The iconic font */
+    font-size: 14px;
+    line-height: 1.5;
+    color: #000080;
+    /* Navy blue */
+    background-color: #ffffe0;
+    /* Light yellow background */
+    margin: 20px;
+    /* background-image: url('FREE2PEE.gif'); */
+    /* Use a repeating pattern or tiled GIF for true early-internet vibes */
+    text-shadow: 1px 1px #FF4500;
+    /* Orangey shadow for text */
+}
+
+table {
+    width: 100%;
+    border-collapse: separate;
+    /* We want the 3D look, so don't collapse borders */
+    border-spacing: 5px;
+    /* Spacing between cells to give a 3D effect */
+    border: 2px outset #000080;
+    /* Navy blue border with a 3D effect */
+    margin-bottom: 20px;
+    background-color: #ADD8E6;
+    /* A light blue reminiscent of old web designs */
+}
+
+th,
+td {
+    text-align: left;
+    padding: 10px;
+    border: 1px solid #8B0000;
+    /* Dark red borders */
+    font-size: 16px;
+}
+
+th {
+    background-color: #FFD700;
+    /* Gold for the headers */
+    font-weight: bold;
+    border: 2px groove #8B4513;
+    /* Saddle brown border with a groove effect */
+    text-transform: uppercase;
+    /* All caps headers */
+}
+
+tr:nth-child(even) {
+    background-color: #FFFAF0;
+    /* Floral white alternate rows */
+}
+
+/* Animated link hover for added flair */
+a:hover {
+    text-decoration: none;
+    color: #FF4500;
+    /* Orangy color */
+    text-shadow: none;
+    transform: scale(1.1);
+    /* Slightly enlarges the link */
+    transition: transform 0.2s ease-in-out;
+}

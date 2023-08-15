@@ -428,9 +428,7 @@ pub fn fetch_example(cx: Scope) -> impl IntoView {
 
                 view! { cx,
                     <h2>
-                        <a href="https://github.com/free2pee/free2pee" target="_blank">
-                            FREE2PEE
-                        </a>
+                        <a href="https://github.com/free2pee/free2pee" target="_blank">FREE2PEE</a>
                     </h2>
                     <h2>
                         {format!("Bathrooms accessed at {} around {},{}", date_string, lat, lon)}
@@ -442,7 +440,7 @@ pub fn fetch_example(cx: Scope) -> impl IntoView {
                                 // <th>"Node lat,lon"</th>
                                 <th>"OSM Node"</th>
                                 <th>"Directions"</th>
-                                <th>"Distance [m]"</th>
+                                <th title="Distance in meters">"Distance [m]"</th>
                             // <th>"Duration [s]"</th>
                             </tr>
                         </thead>
