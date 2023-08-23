@@ -208,19 +208,20 @@ pub async fn walking_time_distance(
     Ok(distances)
 }
 
-fn format_query(radius: i32, lat: f64, lon: f64) -> String {
+fn format_query(radius: i32, lat: f64, lon: f64, q: &str) -> String {
     format!(
-        "[out:json];(node[\"amenity\"=\"toilets\"](around:{},{},{});way[\"amenity\"=\"toilets\"](around:{},{},{}););out body;out center;",
+        "[out:json];(node[\"amenity\"=\"{q}\"](around:{},{},{});way[\"amenity\"=\"{q}\"](around:{},{},{}););out body;out center;",
         radius, lat, lon, radius, lat, lon
     )
 }
 
-fn query_url(radius: i32, lat: f64, lon: f64) -> String {
-    let query = format_query(radius, lat, lon);
+fn query_url(radius: i32, lat: f64, lon: f64, q: &str) -> String {
+    let query = format_query(radius, lat, lon, q);
+    console::log_1(&serde_wasm_bindgen::to_value(&query).unwrap());
     format!("https://overpass-api.de/api/interpreter?data={}", query)
 }
 
-pub async fn fetch_bathrooms(_: ()) -> Result<(Vec<Element>, TableRoot, (f64, f64))> {
+pub async fn fetch_bathrooms(_: ()) -> Result<(Vec<Element>, TableRoot, (u32, f64, f64, String))> {
     let (sender, receiver) = oneshot::channel::<Result<(f64, f64), BathroomError>>();
     let sender = Arc::new(Mutex::new(Some(sender)));
 
@@ -264,7 +265,7 @@ pub async fn fetch_bathrooms(_: ()) -> Result<(Vec<Element>, TableRoot, (f64, f6
     let search_params = web_sys::UrlSearchParams::new_with_str(&search).unwrap();
 
     // Get the radius, or default to 2000 if not provided.
-    let radius: i64 = search_params
+    let radius: u32 = search_params
         .get("around")
         .unwrap_or_else(|| "2000".to_string())
         .parse()
@@ -281,7 +282,12 @@ pub async fn fetch_bathrooms(_: ()) -> Result<(Vec<Element>, TableRoot, (f64, f6
             lon = new_lon;
         }
     }
-    let url = query_url(radius as i32, lat, lon);
+    let mut amenity = "toilets".to_string();
+    if let Some(q_qp) = search_params.get("q") {
+        amenity = q_qp;        
+    }
+
+    let url = query_url(radius as i32, lat, lon, &amenity);
     let res: OverpassResponse = reqwasm::http::Request::get(&url)
         .send()
         .await
@@ -326,7 +332,7 @@ pub async fn fetch_bathrooms(_: ()) -> Result<(Vec<Element>, TableRoot, (f64, f6
     console::log_1(&val);
     
 
-    Ok((unique_elements.to_owned(), json, (lat, lon)))
+    Ok((unique_elements.to_owned(), json, (radius, lat, lon, amenity)))
 }
 
 pub fn fetch_example(cx: Scope) -> impl IntoView {
@@ -362,7 +368,7 @@ pub fn fetch_example(cx: Scope) -> impl IntoView {
     let bathrooms_view = move || {
         bathrooms.read(cx).map(|data| {
             data.map(|data| {
-                let (elements, routing_json, (lat, lon)) = data;
+                let (elements, routing_json, (radius, lat, lon, q)) = data;
                 let now = js_sys::Date::new_0(); //.to_json();
                 let date_string = now.to_locale_time_string("en-US"); //.to_string();
                 // let route_str = serde_json::to_string_pretty(&routing_json).unwrap();
@@ -387,8 +393,6 @@ pub fn fetch_example(cx: Scope) -> impl IntoView {
                     log_1(&val);
                     let (el_lat, el_lon) = element.get_coords().unwrap();
                     // if let Some((el_lat, el_lon)) = element.get_coords() {
-
-
                         // Some(view! { cx,
                         view! { cx,
                             <tr>
@@ -505,7 +509,7 @@ mod tests {
         ];
         
         for (lat, lon) in pts {
-            let url = query_url(2000, lat, lon);
+            let url = query_url(2000, lat, lon, "toilets");
             println!("{}", url);
             println!("{}", f2plocal_url(lat, lon));
             // let res = reqwasm::http::Request::get(&url)
