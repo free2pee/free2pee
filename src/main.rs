@@ -61,8 +61,8 @@ impl Element {
             Some((lat, lon))
             // (lat, lon)
         } else if let Some(center) = &self.center {
-            let val = serde_wasm_bindgen::to_value(center).unwrap();
-            log_1(&val);
+            // let val = serde_wasm_bindgen::to_value(center).unwrap();
+            // log_1(&val);
             Some((center.lat, center.lon))
             // (center.lat, center.lon)
             // Some((center["lat"].as_f64().unwrap(), center["lon"].as_f64().unwrap()))
@@ -209,6 +209,15 @@ pub async fn walking_time_distance(
 }
 
 fn format_query(radius: i32, lat: f64, lon: f64, q: &str) -> String {
+    if q == "toilets" {
+        let qstr = format!(
+    "[out:json];(node[\"amenity\"=\"{q}\"](around:{},{},{}) -> .a; node[\"toilets\"][\"toilets\"!=\"no\"](around:{},{},{}) -> .b; node[\"toilets:*\"](around:{},{},{}) -> .c; (.a; .b; .c;); way[\"amenity\"=\"{q}\"](around:{},{},{}); way[\"toilets\"][\"toilets\"!=\"no\"](around:{},{},{}); way[\"toilets:*\"](around:{},{},{}););out body;out center;",
+    radius, lat, lon, radius, lat, lon, radius, lat, lon, radius, lat, lon, radius, lat, lon, radius,lat,lon
+);
+        return qstr;
+
+    }
+
     format!(
         "[out:json];(node[\"amenity\"=\"{q}\"](around:{},{},{});way[\"amenity\"=\"{q}\"](around:{},{},{}););out body;out center;",
         radius, lat, lon, radius, lat, lon
@@ -217,7 +226,7 @@ fn format_query(radius: i32, lat: f64, lon: f64, q: &str) -> String {
 
 fn query_url(radius: i32, lat: f64, lon: f64, q: &str) -> String {
     let query = format_query(radius, lat, lon, q);
-    console::log_1(&serde_wasm_bindgen::to_value(&query).unwrap());
+    // console::log_1(&serde_wasm_bindgen::to_value(&query).unwrap());
     format!("https://overpass-api.de/api/interpreter?data={}", query)
 }
 
@@ -315,21 +324,21 @@ pub async fn fetch_bathrooms(_: ()) -> Result<(Vec<Element>, TableRoot, (u32, f6
     let unique_elements: Vec<_> = good_elements.iter()
     .unique_by(|e| e.id).cloned() // Replace with your uniqueness criteria
     .collect();
-    let val2 = serde_wasm_bindgen::to_value(&format!("Number of elements: {}", els.len())).unwrap();
-    console::log_1(&val2);
-    let val3 = serde_wasm_bindgen::to_value(&format!("Number of good elements: {}", good_elements.len())).unwrap();
-    console::log_1(&val3);
-    let val4 = serde_wasm_bindgen::to_value(&format!("Number of good unique: {}", unique_elements.len())).unwrap();
-    console::log_1(&val4);
+    // let val2 = serde_wasm_bindgen::to_value(&format!("Number of elements: {}", els.len())).unwrap();
+    // console::log_1(&val2);
+    // let val3 = serde_wasm_bindgen::to_value(&format!("Number of good elements: {}", good_elements.len())).unwrap();
+    // console::log_1(&val3);
+    // let val4 = serde_wasm_bindgen::to_value(&format!("Number of good unique: {}", unique_elements.len())).unwrap();
+    // console::log_1(&val4);
     // let destinations: Vec<_> = res.elements.iter().map(|e| e.get_coords()).collect();
     let destinations: Vec<_> = unique_elements.iter().map(|e| e.get_coords().unwrap()).collect();
-    let val3 = serde_wasm_bindgen::to_value(&format!("Number of destinations: {}", destinations.len())).unwrap();
-    console::log_1(&val3);
+    // let val3 = serde_wasm_bindgen::to_value(&format!("Number of destinations: {}", destinations.len())).unwrap();
+    // console::log_1(&val3);
 
     let json = fetch_table_data((lat, lon), destinations).await?;
 
-    let val = serde_wasm_bindgen::to_value(&json).unwrap();
-    console::log_1(&val);
+    // let val = serde_wasm_bindgen::to_value(&json).unwrap();
+    // console::log_1(&val);
     
 
     Ok((unique_elements.to_owned(), json, (radius, lat, lon, amenity)))
@@ -373,8 +382,8 @@ pub fn fetch_example(cx: Scope) -> impl IntoView {
                 let date_string = now.to_locale_time_string("en-US"); //.to_string();
                 // let route_str = serde_json::to_string_pretty(&routing_json).unwrap();
                 let dists = &routing_json.distances[0];
-                let x = serde_wasm_bindgen::to_value(&format!("nels: {}, ndists: {:?}", elements.len(), dists.len())).unwrap();
-                log_1(&x);
+                // let x = serde_wasm_bindgen::to_value(&format!("nels: {}, ndists: {:?}", elements.len(), dists.len())).unwrap();
+                // log_1(&x);
                 assert_eq!(dists.len(), elements.len() + 1);
                 // let durs = &routing_json.durations[0];
 
@@ -389,8 +398,8 @@ pub fn fetch_example(cx: Scope) -> impl IntoView {
                 let bathroom_elements = bathroom_data.iter().map(|(element, dist)| {
                 // let bathroom_elements = bathroom_data.iter().filter_map(|(element, dist)| {
                     let s = format!("{:?}", element.tags);
-                    let val = serde_wasm_bindgen::to_value(&element).unwrap();
-                    log_1(&val);
+                    // let val = serde_wasm_bindgen::to_value(&element).unwrap();
+                    // log_1(&val);
                     let (el_lat, el_lon) = element.get_coords().unwrap();
                     // if let Some((el_lat, el_lon)) = element.get_coords() {
                         // Some(view! { cx,
